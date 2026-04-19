@@ -1,0 +1,52 @@
+{
+  "baseUrl": "http://127.0.0.1:4173",
+  "roomId": "room_9ff9a24b",
+  "results": [
+    {
+      "account": "sha",
+      "status": "mahjong",
+      "url": "http://127.0.0.1:4173/room/room_9ff9a24b"
+    },
+    {
+      "account": "nian",
+      "status": "failed",
+      "url": "http://127.0.0.1:4173/room/room_9ff9a24b",
+      "roomMessage": "",
+      "error": "page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/mahjong**\" until \"load\"\n============================================================"
+    },
+    {
+      "account": "long",
+      "status": "failed",
+      "url": "http://127.0.0.1:4173/room/room_9ff9a24b",
+      "roomMessage": "",
+      "error": "page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/mahjong**\" until \"load\"\n============================================================"
+    },
+    {
+      "account": "abi",
+      "status": "failed",
+      "url": "http://127.0.0.1:4173/room/room_9ff9a24b",
+      "roomMessage": "",
+      "error": "page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/mahjong**\" until \"load\"\n============================================================"
+    }
+  ],
+  "events": [
+    "[sha] login-ok",
+    "[nian] login-ok",
+    "[long] login-ok",
+    "[abi] login-ok",
+    "[sha] create-room:room_9ff9a24b",
+    "[nian] join-room:room_9ff9a24b",
+    "[long] join-room:room_9ff9a24b",
+    "[abi] join-room:room_9ff9a24b",
+    "[sha] room-filled",
+    "[nian] room-filled",
+    "[long] room-filled",
+    "[abi] room-filled",
+    "[sha] ready-clicked",
+    "[nian] ready-clicked",
+    "[long] ready-clicked",
+    "[abi] ready-clicked",
+    "[sha] start-clicked",
+    "[sha] mahjong-entered"
+  ]
+}

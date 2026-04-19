@@ -1,0 +1,402 @@
+{
+  "webBase": "http://127.0.0.1:4174",
+  "apiBase": "http://127.0.0.1:9998",
+  "serviceState": {
+    "frontend": true,
+    "backend": true
+  },
+  "stage": "wait-for-mahjong",
+  "snapshots": {
+    "afterLogin": {
+      "url": "http://127.0.0.1:4174/lobby"
+    },
+    "roomReloadBeforeStart": {
+      "url": "http://127.0.0.1:4174/room/room_db0512d3",
+      "bodyText": "娱乐大厅 / 房间页 山东麻将 房间号 room_db0512d3 · WAITING 连接不稳定 退出房间 当前玩法 山东麻将 和其他玩家准备完毕后，即可从这里进入山东麻将牌桌。 房主 sha 人数 4/4 启动状态 下一局准备中 座位布局 确认入座后准备，等房主开局即可进入牌桌。 1号位 sha 玩家 未准备 2号位 nian 玩家 未准备 3号位 long 玩家 未准备 4号位 abi 玩家 未准备 房间操作 全员满座并准备完成后，由房主开始本局；结算后可重新准备下一局。 我已准备 等待房主开始 上一局已结束，旧 gameId 已清理。等待大家重新准备后，由房主再次开始。"
+    },
+    "beforeStart": {
+      "code": 200,
+      "msg": "操作成功",
+      "data": {
+        "room": {
+          "roomId": "room_db0512d3",
+          "roomName": "low-memory-stable",
+          "gameCode": "SHANDONG_MAHJONG",
+          "maxPlayerCount": 4,
+          "hostPlayerId": "sha",
+          "status": "WAITING",
+          "matchId": "match_b280df95ad5c4f96949c7c2815d4afe7",
+          "maxRoundCount": 8,
+          "currentGameId": null,
+          "lastFinishedGameId": null,
+          "currentRoundIndex": 0,
+          "completedRoundCount": 0,
+          "currentDealerPosition": null,
+          "continuousDealerCount": 0,
+          "waitingNextRound": false,
+          "matchCompleted": false,
+          "matchFinishReason": null,
+          "matchFinishedAt": null,
+          "createTime": 1776577874054,
+          "updateTime": 1776577874721,
+          "version": 8,
+          "seats": [
+            {
+              "position": 0,
+              "playerId": "sha",
+              "playerName": "sha",
+              "ready": true,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "occupied": true
+            },
+            {
+              "position": 1,
+              "playerId": "nian",
+              "playerName": "nian",
+              "ready": true,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "occupied": true
+            },
+            {
+              "position": 2,
+              "playerId": "long",
+              "playerName": "long",
+              "ready": true,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "occupied": true
+            },
+            {
+              "position": 3,
+              "playerId": "abi",
+              "playerName": "abi",
+              "ready": true,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "occupied": true
+            }
+          ],
+          "readyCount": 4,
+          "allReady": true,
+          "seatedCount": 4,
+          "full": true
+        },
+        "currentGame": null,
+        "finalSettlement": null,
+        "seatedCount": 4,
+        "readyCount": 4,
+        "allReady": true
+      }
+    },
+    "afterStart": {
+      "code": 200,
+      "msg": "操作成功",
+      "data": {
+        "room": {
+          "roomId": "room_db0512d3",
+          "roomName": "low-memory-stable",
+          "gameCode": "SHANDONG_MAHJONG",
+          "maxPlayerCount": 4,
+          "hostPlayerId": "sha",
+          "status": "PLAYING",
+          "matchId": "match_b280df95ad5c4f96949c7c2815d4afe7",
+          "maxRoundCount": 8,
+          "currentGameId": "c9eae504-aa29-482a-936d-ebda2b9bdd41",
+          "lastFinishedGameId": null,
+          "currentRoundIndex": 1,
+          "completedRoundCount": 0,
+          "currentDealerPosition": 0,
+          "continuousDealerCount": 1,
+          "waitingNextRound": false,
+          "matchCompleted": false,
+          "matchFinishReason": null,
+          "matchFinishedAt": null,
+          "createTime": 1776577874054,
+          "updateTime": 1776577874726,
+          "version": 9,
+          "seats": [
+            {
+              "position": 0,
+              "playerId": "sha",
+              "playerName": "sha",
+              "ready": false,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 1,
+              "occupied": true
+            },
+            {
+              "position": 1,
+              "playerId": "nian",
+              "playerName": "nian",
+              "ready": false,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "occupied": true
+            },
+            {
+              "position": 2,
+              "playerId": "long",
+              "playerName": "long",
+              "ready": false,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "occupied": true
+            },
+            {
+              "position": 3,
+              "playerId": "abi",
+              "playerName": "abi",
+              "ready": false,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "occupied": true
+            }
+          ],
+          "readyCount": 0,
+          "allReady": false,
+          "seatedCount": 4,
+          "full": true
+        },
+        "currentGame": {
+          "gameId": "c9eae504-aa29-482a-936d-ebda2b9bdd41",
+          "roomId": "room_db0512d3",
+          "matchId": "match_b280df95ad5c4f96949c7c2815d4afe7",
+          "previousGameId": null,
+          "status": "PLAYING",
+          "createTime": 1776577874726,
+          "startTime": 1776577874726,
+          "endTime": null,
+          "round": 1,
+          "dealerPosition": 0,
+          "nextDealerPosition": 0,
+          "dealerRetained": false,
+          "continuousDealerCount": 1,
+          "currentPlayerPosition": 0,
+          "turnPhase": "WAITING_FOR_DISCARD",
+          "lastDiscardedTile": null,
+          "lastPlayerPosition": null,
+          "lastKongType": null,
+          "lastDrawnTile": null,
+          "actionWindow": null,
+          "turnDeadlineAt": 1776577889726,
+          "remainingTileCount": 83,
+          "roundSettlement": null,
+          "viewerPlayerId": "nian",
+          "viewerPosition": 1,
+          "players": [
+            {
+              "playerId": "sha",
+              "playerName": "sha",
+              "position": 0,
+              "handTileCount": 14,
+              "discardedTiles": [],
+              "pongTiles": [],
+              "chowTiles": [],
+              "kongTiles": [],
+              "isDealer": true,
+              "isTing": false,
+              "isWin": false,
+              "autoManaged": false,
+              "winType": null,
+              "winFan": 0,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 1,
+              "self": false
+            },
+            {
+              "playerId": "nian",
+              "playerName": "nian",
+              "position": 1,
+              "handTileCount": 13,
+              "discardedTiles": [],
+              "pongTiles": [],
+              "chowTiles": [],
+              "kongTiles": [],
+              "isDealer": false,
+              "isTing": false,
+              "isWin": false,
+              "autoManaged": false,
+              "winType": null,
+              "winFan": 0,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "self": true,
+              "handTiles": [
+                {
+                  "id": "7e0abc82-c1ef-4f9e-a6f8-d01667a9bcec",
+                  "type": "BAMBOO",
+                  "value": "4",
+                  "displayName": "4条",
+                  "sortValue": 4
+                },
+                {
+                  "id": "9114ea37-4e2e-4aae-b4d6-7e3305bce695",
+                  "type": "BAMBOO",
+                  "value": "4",
+                  "displayName": "4条",
+                  "sortValue": 4
+                },
+                {
+                  "id": "619c87b3-f320-461b-9d52-44566f78d33f",
+                  "type": "BAMBOO",
+                  "value": "7",
+                  "displayName": "7条",
+                  "sortValue": 7
+                },
+                {
+                  "id": "db967ba6-db7c-4331-92bc-ec83fe36e400",
+                  "type": "BAMBOO",
+                  "value": "8",
+                  "displayName": "8条",
+                  "sortValue": 8
+                },
+                {
+                  "id": "bff77730-a71d-487e-b37a-a1d334c26af1",
+                  "type": "CHARACTER",
+                  "value": "3",
+                  "displayName": "3万",
+                  "sortValue": 13
+                },
+                {
+                  "id": "b82493d2-db04-4f50-b2ae-2f6b5114ed87",
+                  "type": "CHARACTER",
+                  "value": "5",
+                  "displayName": "5万",
+                  "sortValue": 15
+                },
+                {
+                  "id": "92e4d8da-2708-4a1d-b6c5-2f8654388b81",
+                  "type": "CHARACTER",
+                  "value": "6",
+                  "displayName": "6万",
+                  "sortValue": 16
+                },
+                {
+                  "id": "fc7fc11d-fd55-4b1f-b5d4-9b78a44f9e29",
+                  "type": "CHARACTER",
+                  "value": "7",
+                  "displayName": "7万",
+                  "sortValue": 17
+                },
+                {
+                  "id": "3b7427b0-38b1-4336-bbf9-311eccf728b5",
+                  "type": "CHARACTER",
+                  "value": "7",
+                  "displayName": "7万",
+                  "sortValue": 17
+                },
+                {
+                  "id": "b740282e-ca69-481e-868a-074d99740e20",
+                  "type": "DOT",
+                  "value": "1",
+                  "displayName": "1筒",
+                  "sortValue": 21
+                },
+                {
+                  "id": "08997210-9052-4dbd-ae1d-bc17225c6eb0",
+                  "type": "DOT",
+                  "value": "5",
+                  "displayName": "5筒",
+                  "sortValue": 25
+                },
+                {
+                  "id": "08187699-845c-4f8f-ba6b-bbebaff3fdf0",
+                  "type": "WIND",
+                  "value": "南",
+                  "displayName": "南",
+                  "sortValue": 32
+                },
+                {
+                  "id": "702d024b-7fd5-4249-a74a-8cc4a9d89373",
+                  "type": "WIND",
+                  "value": "西",
+                  "displayName": "西",
+                  "sortValue": 33
+                }
+              ]
+            },
+            {
+              "playerId": "long",
+              "playerName": "long",
+              "position": 2,
+              "handTileCount": 13,
+              "discardedTiles": [],
+              "pongTiles": [],
+              "chowTiles": [],
+              "kongTiles": [],
+              "isDealer": false,
+              "isTing": false,
+              "isWin": false,
+              "autoManaged": false,
+              "winType": null,
+              "winFan": 0,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "self": false
+            },
+            {
+              "playerId": "abi",
+              "playerName": "abi",
+              "position": 3,
+              "handTileCount": 13,
+              "discardedTiles": [],
+              "pongTiles": [],
+              "chowTiles": [],
+              "kongTiles": [],
+              "isDealer": false,
+              "isTing": false,
+              "isWin": false,
+              "autoManaged": false,
+              "winType": null,
+              "winFan": 0,
+              "totalScore": 0,
+              "lastScoreDelta": 0,
+              "winRoundCount": 0,
+              "dealerRoundCount": 0,
+              "self": false
+            }
+          ]
+        },
+        "finalSettlement": null,
+        "seatedCount": 4,
+        "readyCount": 0,
+        "allReady": false
+      }
+    }
+  },
+  "events": [
+    "login-ok:nian",
+    "room-created:room_db0512d3",
+    "room-opened:当前玩法 山东麻将 和其他玩家准备完毕后，即可从这里进入山东麻将牌桌。 房主 sha 人数 4/4 启动状态 下一局准备中 座位布局 确认入座后准备，等房主开局即可进入牌桌。 1号位 sha 玩家 未准备 2号位 nian 玩家 未准备 3号位 long 玩家 未准备 4号位 abi 玩家 未准备 房间操作 全员满座并准备完成后，由房主开始本局；结算后可重新准备下一局。 我已准备 等待房主开始 上",
+    "room-reloaded-before-start:http://127.0.0.1:4174/room/room_db0512d3",
+    "all-ready",
+    "before-start:WAITING:",
+    "host-started",
+    "after-start:PLAYING:c9eae504-aa29-482a-936d-ebda2b9bdd41"
+  ],
+  "roomId": "room_db0512d3"
+}

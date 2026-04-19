@@ -4,6 +4,7 @@ import SockJS from 'sockjs-client/dist/sockjs'
 const SYSTEM_TOPIC = '/user/queue/system'
 const AUTH_DESTINATION = '/app/system/auth'
 const PING_DESTINATION = '/app/system/ping'
+const RECONNECT_SNAPSHOT_DESTINATION = '/app/system/reconnect-snapshot'
 const PING_INTERVAL = 25000
 
 function createTraceId() {
@@ -24,7 +25,14 @@ function buildEnvelope(scene, event, payload = {}) {
 }
 
 function readAuthToken() {
-  return localStorage.getItem('token') || localStorage.getItem('username') || ''
+  const token = localStorage.getItem('token') || ''
+  const username = localStorage.getItem('username') || ''
+
+  if (!token || token.startsWith('mock-token-')) {
+    return username
+  }
+
+  return token
 }
 
 function parseEnvelope(body) {
@@ -123,7 +131,7 @@ class RealtimeService {
 
     this.client = new Client({
       reconnectDelay: 5000,
-      webSocketFactory: () => new SockJS('/ws'),
+      webSocketFactory: () => new SockJS('/api/ws'),
       debug: () => {},
       onConnect: () => {
         this.notifyStatus(true)
@@ -215,6 +223,13 @@ class RealtimeService {
       destination,
       body: JSON.stringify(body)
     })
+  }
+
+  requestReconnectSnapshot(payload = {}) {
+    return this.publish(
+      RECONNECT_SNAPSHOT_DESTINATION,
+      buildEnvelope('system', 'RECONNECT_SNAPSHOT', payload)
+    )
   }
 
   unsubscribe(key) {

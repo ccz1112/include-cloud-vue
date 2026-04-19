@@ -4,7 +4,7 @@
       <div>
         <p class="eyebrow">娱乐大厅</p>
         <h1>棋牌乐园</h1>
-        <p class="welcome-copy">当前已接入山东麻将演示联调，并为房间系统和山东够级预留了大厅结构。</p>
+        <p class="welcome-copy">选择玩法、创建房间，和朋友一起开始一局牌。</p>
       </div>
       <div class="header-right">
         <span class="realtime-pill" :class="{ online: realtimeConnected }">{{ realtimeLabel }}</span>
@@ -21,12 +21,12 @@
           <p class="hero-copy">{{ selectedGame.description }}</p>
         </div>
         <div class="hero-actions">
-          <button class="primary-btn" @click="quickStart(selectedGame)">
+          <button class="primary-btn" :disabled="creatingRoom" @click="quickStart(selectedGame)">
             {{ selectedGame.quickStartMode ? '快速开始' : '进入房间' }}
           </button>
           <button
             class="secondary-btn"
-            :disabled="!selectedGame.supportsRooms"
+            :disabled="!selectedGame.supportsRooms || creatingRoom"
             @click="createRoom(selectedGame)"
           >
             创建房间
@@ -38,7 +38,7 @@
         <div class="panel">
           <div class="section-head">
             <h2>玩法列表</h2>
-            <p>先把大厅和房间流转搭起来，后面再逐步替换为真实接口。</p>
+            <p>当前可体验本地练习与山东麻将在线房间对局。</p>
           </div>
           <div class="game-grid">
             <article
@@ -55,12 +55,12 @@
               <h3>{{ game.title }}</h3>
               <p>{{ game.description }}</p>
               <div class="card-actions">
-                <button class="card-btn" @click.stop="quickStart(game)">
+                <button class="card-btn" :disabled="creatingRoom" @click.stop="quickStart(game)">
                   {{ game.quickStartMode ? '快速开始' : '进入房间' }}
                 </button>
                 <button
                   class="card-btn muted"
-                  :disabled="!game.supportsRooms"
+                  :disabled="!game.supportsRooms || creatingRoom"
                   @click.stop="createRoom(game)"
                 >
                   创建房间
@@ -73,7 +73,7 @@
         <div class="panel rooms-panel">
           <div class="section-head">
             <h2>房间列表</h2>
-            <p>{{ selectedGame.title }} 的房间先用 Mock 数据占位，后续直接替换为后端接口。</p>
+            <p>{{ selectedGame.title }} 的在场房间会显示在这里。</p>
           </div>
           <div v-if="roomList.length" class="room-list">
             <article v-for="room in roomList" :key="room.id" class="room-item">
@@ -84,13 +84,16 @@
               <div class="room-meta">
                 <span>{{ room.players.length }}/{{ room.maxPlayers }}</span>
                 <span>{{ room.status }}</span>
-                <button class="join-btn" @click="joinRoom(room)">加入</button>
+                <button class="join-btn" :disabled="joiningRoomId === room.id" @click="joinRoom(room)">
+                  {{ joiningRoomId === room.id ? '加入中...' : '加入' }}
+                </button>
               </div>
             </article>
           </div>
           <div v-else class="empty-state">
-            <p>当前玩法还没有展示中的房间，先创建一个骨架房间即可继续联调。</p>
+            <p>当前还没有可加入的房间，创建一个新房间开始吧。</p>
           </div>
+          <p v-if="roomError" class="room-error">{{ roomError }}</p>
         </div>
       </section>
     </main>
@@ -98,8 +101,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { createRoom as createRoomRequest, joinRoom as joinRoomRequest, listRooms } from '../api/room.js'
 import { useLobbyStore } from '../stores/lobby.js'
 import { useRoomStore } from '../stores/room.js'
 import { useUserStore } from '../stores/user.js'
@@ -116,31 +120,84 @@ const selectedGame = computed(() => lobbyStore.selectedGame)
 const roomList = computed(() => lobbyStore.filteredRooms)
 const realtimeConnected = computed(() => lobbyStore.realtimeConnected)
 const realtimeLabel = computed(() => realtimeConnected.value ? '实时已连接' : '实时未连接')
+const creatingRoom = ref(false)
+const joiningRoomId = ref('')
+const roomError = ref('')
 let unsubscribeLobby = null
 let unsubscribeStatus = null
 
 function chooseGame(gameId) {
   lobbyStore.selectGame(gameId)
+  loadRooms()
 }
 
 function quickStart(game) {
+  if (game.supportsRooms) {
+    createRoom(game)
+    return
+  }
   if (game.quickStartMode) {
     localStorage.setItem('gameMode', game.quickStartMode)
     router.push('/mahjong')
-    return
   }
-  createRoom(game)
 }
 
-function createRoom(game) {
+async function loadRooms() {
+  const game = selectedGame.value
+  if (!game?.supportsRooms) return
+
+  roomError.value = ''
+  try {
+    const rooms = await listRooms({ gameCode: game.gameCode, status: 'WAITING' })
+    lobbyStore.setRoomsForGame(game.gameCode, rooms)
+  } catch (error) {
+    roomError.value = error instanceof Error ? error.message : '房间列表加载失败'
+  }
+}
+
+async function createRoom(game) {
   if (!game.supportsRooms) return
-  const room = roomStore.createRoomFromGame(game, userStore.username)
-  router.push(`/room/${room.id}`)
+
+  creatingRoom.value = true
+  roomError.value = ''
+
+  try {
+    const room = await createRoomRequest({
+      gameCode: game.gameCode,
+      hostPlayerId: userStore.username,
+      ownerName: userStore.username,
+      hostPlayerName: userStore.username,
+      roomName: `${game.title}房间`,
+      maxPlayers: game.maxPlayers
+    })
+    roomStore.setCurrentRoom(room)
+    localStorage.setItem('gameMode', game.quickStartMode || '')
+    await router.push(`/room/${room.id}`)
+    loadRooms().catch(() => {})
+  } catch (error) {
+    roomError.value = error instanceof Error ? error.message : '创建房间失败'
+  } finally {
+    creatingRoom.value = false
+  }
 }
 
-function joinRoom(room) {
-  const joinedRoom = roomStore.joinRoom(room, userStore.username)
-  router.push(`/room/${joinedRoom.id}`)
+async function joinRoom(room) {
+  joiningRoomId.value = room.id
+  roomError.value = ''
+
+  try {
+    const joinedRoom = await joinRoomRequest(room.id, {
+      playerId: userStore.username,
+      playerName: userStore.username
+    })
+    roomStore.setCurrentRoom(joinedRoom)
+    localStorage.setItem('gameMode', room.gameId === 'standard-mahjong' ? 'standard' : 'shandong')
+    router.push(`/room/${joinedRoom.id}`)
+  } catch (error) {
+    roomError.value = error instanceof Error ? error.message : '加入房间失败'
+  } finally {
+    joiningRoomId.value = ''
+  }
 }
 
 function logout() {
@@ -149,6 +206,8 @@ function logout() {
 }
 
 onMounted(async () => {
+  loadRooms()
+
   unsubscribeStatus = realtimeService.onStatusChange(connected => {
     lobbyStore.setRealtimeConnected(connected)
   })
@@ -177,12 +236,13 @@ onUnmounted(() => {
 <style scoped>
 .lobby-page {
   min-height: 100vh;
-  padding: 28px;
+  padding: 30px;
   background:
     radial-gradient(circle at top left, rgba(211, 161, 55, 0.2), transparent 28%),
+    radial-gradient(circle at 85% 12%, rgba(63, 119, 93, 0.16), transparent 24%),
     linear-gradient(155deg, #10251d 0%, #07120d 100%);
   color: #f7f0dc;
-  font-family: 'Microsoft YaHei', sans-serif;
+  position: relative;
 }
 
 .lobby-header,
@@ -197,12 +257,12 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
-  margin-bottom: 24px;
+  margin-bottom: 26px;
 }
 
 .eyebrow {
   margin: 0 0 10px;
-  color: rgba(247, 240, 220, 0.58);
+  color: rgba(247, 240, 220, 0.54);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 13px;
@@ -210,20 +270,25 @@ onUnmounted(() => {
 
 .lobby-header h1 {
   margin: 0 0 10px;
-  font-size: 42px;
-  color: #ffd76b;
+  font-size: 52px;
+  color: #ffe6a8;
 }
 
 .welcome-copy {
   margin: 0;
-  max-width: 640px;
-  color: rgba(247, 240, 220, 0.72);
+  max-width: 680px;
+  color: rgba(247, 240, 220, 0.7);
+  font-size: 15px;
 }
 
 .header-right {
   display: flex;
   align-items: center;
   gap: 14px;
+  padding: 12px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 215, 107, 0.08);
 }
 
 .username {
@@ -261,17 +326,36 @@ onUnmounted(() => {
   padding: 12px 18px;
   background: rgba(255, 92, 92, 0.15);
   color: #ffb0b0;
+  border: 1px solid rgba(255, 176, 176, 0.12);
 }
 
 .hero-panel {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.2fr auto;
   justify-content: space-between;
   gap: 18px;
-  padding: 24px;
+  padding: 30px;
   margin-bottom: 24px;
-  border-radius: 28px;
-  background: linear-gradient(135deg, rgba(255, 215, 107, 0.16), rgba(255,255,255,0.03));
+  border-radius: 32px;
+  background:
+    linear-gradient(135deg, rgba(255, 215, 107, 0.12), rgba(255,255,255,0.02)),
+    rgba(9, 17, 14, 0.7);
   border: 1px solid rgba(255, 215, 107, 0.18);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+
+.hero-panel::after {
+  content: '';
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  right: -70px;
+  top: -80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 107, 0.15), transparent 70%);
+  pointer-events: none;
 }
 
 .hero-label {
@@ -281,7 +365,7 @@ onUnmounted(() => {
 
 .hero-panel h2 {
   margin: 0 0 10px;
-  font-size: 30px;
+  font-size: 34px;
   color: #fff2bc;
 }
 
@@ -289,12 +373,16 @@ onUnmounted(() => {
   margin: 0;
   max-width: 620px;
   color: rgba(247, 240, 220, 0.74);
+  line-height: 1.7;
 }
 
 .hero-actions {
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  align-items: center;
+  align-items: stretch;
+  min-width: 190px;
+  justify-content: center;
 }
 
 .primary-btn,
@@ -325,15 +413,16 @@ onUnmounted(() => {
 .content-grid {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
-  gap: 20px;
+  gap: 22px;
 }
 
 .panel {
-  padding: 22px;
-  border-radius: 26px;
+  padding: 24px;
+  border-radius: 28px;
   background: rgba(6, 12, 9, 0.72);
   border: 1px solid rgba(255, 215, 107, 0.12);
   box-shadow: 0 20px 60px rgba(0,0,0,0.24);
+  backdrop-filter: blur(14px);
 }
 
 .section-head {
@@ -357,21 +446,28 @@ onUnmounted(() => {
 .game-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
 .game-card {
-  padding: 18px;
-  border-radius: 22px;
+  position: relative;
+  padding: 20px;
+  border-radius: 24px;
   border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.03);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.game-card:hover {
+  border-color: rgba(255, 215, 107, 0.26);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
 }
 
 .game-card.active {
   border-color: rgba(255, 215, 107, 0.5);
   transform: translateY(-2px);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.24);
 }
 
 .card-top,
@@ -396,6 +492,8 @@ onUnmounted(() => {
 .game-card h3,
 .room-item h3 {
   margin: 16px 0 10px;
+  color: #ffefc0;
+  font-size: 24px;
 }
 
 .game-card p,
@@ -403,6 +501,7 @@ onUnmounted(() => {
 .empty-state p {
   margin: 0;
   color: rgba(247, 240, 220, 0.68);
+  line-height: 1.6;
 }
 
 .card-actions {
@@ -413,6 +512,7 @@ onUnmounted(() => {
   flex: 1;
   background: linear-gradient(135deg, #cf9c26, #ffd76b);
   color: #2b1700;
+  box-shadow: 0 12px 22px rgba(187, 132, 31, 0.18);
 }
 
 .rooms-panel {
@@ -431,9 +531,14 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 12px;
   align-items: center;
-  padding: 16px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.04);
+  padding: 18px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.room-item:hover {
+  border-color: rgba(255, 215, 107, 0.18);
 }
 
 .empty-state {
@@ -442,13 +547,29 @@ onUnmounted(() => {
   justify-content: center;
   min-height: 220px;
   border: 1px dashed rgba(255,255,255,0.12);
-  border-radius: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.02);
+}
+
+.room-error {
+  margin-top: 14px;
+  color: #ffb6a6;
 }
 
 @media (max-width: 980px) {
   .content-grid,
   .game-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hero-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions {
+    min-width: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
 }
 
@@ -463,6 +584,20 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .lobby-page {
+    padding: 18px;
+  }
+
+  .lobby-header h1 {
+    font-size: 40px;
+  }
+
+  .hero-panel,
+  .panel {
+    padding: 20px;
+    border-radius: 24px;
   }
 }
 </style>

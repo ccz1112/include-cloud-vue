@@ -6,14 +6,21 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
-      '/mahjong': {
-        target: 'http://127.0.0.1:9998',
-        changeOrigin: true
-      },
-      '/ws': {
+      '/api/room': {
         target: 'http://127.0.0.1:9998',
         changeOrigin: true,
-        ws: true
+        rewrite: path => path.replace(/^\/api/, '')
+      },
+      '/api/mahjong': {
+        target: 'http://127.0.0.1:9998',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '')
+      },
+      '/api/ws': {
+        target: 'http://127.0.0.1:9998',
+        changeOrigin: true,
+        ws: true,
+        rewrite: path => path.replace(/^\/api/, '')
       }
     }
   }

@@ -9,6 +9,8 @@ export const useMahjongGameStore = defineStore('mahjongGame', {
     latestEvent: '',
     pendingCommand: '',
     currentActions: [],
+    currentOperationState: null,
+    recentEvents: [],
     lastDiscard: null
   }),
   actions: {
@@ -31,6 +33,22 @@ export const useMahjongGameStore = defineStore('mahjongGame', {
     setCurrentActions(actions) {
       this.currentActions = actions
     },
+    setCurrentOperationState(operationState) {
+      this.currentOperationState = operationState || null
+    },
+    pushRecentEvent(envelope) {
+      if (!envelope?.event) return
+      this.recentEvents = [
+        {
+          key: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          event: envelope.event,
+          message: envelope.message || '',
+          timestamp: envelope.timestamp || Date.now(),
+          payload: envelope.payload || {}
+        },
+        ...this.recentEvents
+      ].slice(0, 16)
+    },
     setLastDiscard(tile) {
       this.lastDiscard = tile
     },
@@ -42,6 +60,8 @@ export const useMahjongGameStore = defineStore('mahjongGame', {
       this.latestEvent = ''
       this.pendingCommand = ''
       this.currentActions = []
+      this.currentOperationState = null
+      this.recentEvents = []
       this.lastDiscard = null
     }
   }
