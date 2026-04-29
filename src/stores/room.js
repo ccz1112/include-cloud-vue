@@ -70,7 +70,10 @@ export const useRoomStore = defineStore('room', () => {
 
   const isWaitingNextRound = computed(() => {
     if (!currentRoom.value) return false
-    return currentRoom.value.status === 'WAITING' && !currentRoom.value.currentGameId && !currentRoom.value.matchCompleted
+    return currentRoom.value.status === 'WAITING'
+      && !currentRoom.value.currentGameId
+      && !currentRoom.value.matchCompleted
+      && (!!currentRoom.value.lastFinishedGameId || currentRoom.value.completedRoundCount > 0)
   })
 
   function setCurrentRoom(room) {

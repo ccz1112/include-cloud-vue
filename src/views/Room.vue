@@ -26,7 +26,7 @@
           </div>
           <div>
             <span class="summary-label">人数</span>
-            <strong>{{ currentRoom.players.length }}/{{ currentRoom.maxPlayers }}</strong>
+            <strong>{{ currentRoom.seatedCount ?? currentRoom.players.length }}/{{ currentRoom.maxPlayers }}</strong>
           </div>
           <div>
             <span class="summary-label">启动状态</span>
@@ -423,16 +423,17 @@ onUnmounted(() => {
 <style scoped>
 .room-page {
   min-height: 100vh;
-  padding: 30px;
+  padding: 28px;
   background:
-    radial-gradient(circle at top, rgba(210, 170, 40, 0.16), transparent 30%),
-    radial-gradient(circle at 84% 16%, rgba(78, 124, 112, 0.16), transparent 24%),
-    linear-gradient(160deg, #0b1c22 0%, #071014 100%);
+    linear-gradient(120deg, rgba(231, 178, 76, 0.11), transparent 36%),
+    radial-gradient(circle at 86% 10%, rgba(55, 156, 123, 0.15), transparent 26%),
+    linear-gradient(180deg, #111817 0%, #071013 100%);
   color: #f5ecd2;
 }
 
 .room-header,
 .room-panel {
+  width: 100%;
   max-width: 1180px;
   margin: 0 auto;
 }
@@ -441,8 +442,8 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  align-items: flex-start;
-  margin-bottom: 26px;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .eyebrow {
@@ -455,8 +456,8 @@ onUnmounted(() => {
 
 .room-header h1 {
   margin: 0 0 8px;
-  font-size: 42px;
-  color: #ffe5a5;
+  font-size: clamp(34px, 5vw, 50px);
+  color: #fff0c3;
 }
 
 .room-meta {
@@ -468,10 +469,10 @@ onUnmounted(() => {
 .header-actions {
   display: flex;
   gap: 12px;
-  padding: 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255, 215, 107, 0.08);
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255, 223, 148, 0.12);
 }
 
 .realtime-pill {
@@ -501,21 +502,21 @@ onUnmounted(() => {
 
 .ghost-btn {
   padding: 12px 18px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.075);
   color: #f5ecd2;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .room-content {
   display: grid;
-  gap: 22px;
+  gap: 18px;
 }
 
 .room-panel {
-  background: rgba(6, 14, 18, 0.76);
-  border: 1px solid rgba(255, 215, 107, 0.15);
-  border-radius: 28px;
-  padding: 24px;
+  background: rgba(9, 16, 17, 0.84);
+  border: 1px solid rgba(255, 223, 148, 0.13);
+  border-radius: 18px;
+  padding: 22px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(14px);
 }
@@ -526,17 +527,18 @@ onUnmounted(() => {
   gap: 26px;
   position: relative;
   overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(12, 20, 19, 0.92), rgba(12, 20, 19, 0.62)),
+    linear-gradient(135deg, rgba(255, 205, 96, 0.14), rgba(56, 143, 111, 0.08));
 }
 
 .summary-panel::after {
   content: '';
   position: absolute;
-  width: 220px;
-  height: 220px;
-  right: -90px;
-  top: -90px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 215, 107, 0.12), transparent 72%);
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 223, 148, 0.04), transparent),
+    repeating-linear-gradient(90deg, transparent 0 34px, rgba(255,255,255,0.025) 34px 35px);
   pointer-events: none;
 }
 
@@ -565,10 +567,10 @@ onUnmounted(() => {
 }
 
 .summary-grid div {
-  padding: 18px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
-  border: 1px solid rgba(255,255,255,0.04);
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.075);
 }
 
 .summary-label {
@@ -593,7 +595,7 @@ onUnmounted(() => {
 
 .seats-grid {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .seats-grid.four-seats {
@@ -606,10 +608,12 @@ onUnmounted(() => {
 
 .seat-card {
   min-height: 150px;
-  padding: 20px;
-  border-radius: 22px;
-  border: 1px dashed rgba(255, 215, 107, 0.2);
-  background: rgba(255,255,255,0.03);
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px dashed rgba(255, 223, 148, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)),
+    rgba(255,255,255,0.02);
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
@@ -620,7 +624,10 @@ onUnmounted(() => {
 
 .seat-card.filled {
   border-style: solid;
-  background: linear-gradient(160deg, rgba(255, 215, 107, 0.08), rgba(255,255,255,0.02));
+  background:
+    linear-gradient(160deg, rgba(255, 215, 107, 0.1), rgba(255,255,255,0.025)),
+    rgba(14, 21, 20, 0.86);
+  box-shadow: inset 0 1px rgba(255,255,255,0.06);
 }
 
 .seat-index {
@@ -644,7 +651,7 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(255,255,255,0.08);
   color: #f2bc8c;
   font-size: 12px;
@@ -672,14 +679,14 @@ onUnmounted(() => {
 }
 
 .secondary-btn {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.075);
   color: #f5ecd2;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, #d3a137, #ffd76b);
-  color: #241300;
+  background: linear-gradient(180deg, #ffe08f, #c98b2c);
+  color: #1f1405;
   box-shadow: 0 12px 24px rgba(194, 138, 36, 0.22);
 }
 
@@ -691,7 +698,7 @@ onUnmounted(() => {
 .room-message {
   margin-top: 14px;
   padding: 14px 16px;
-  border-radius: 16px;
+  border-radius: 12px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.05);
 }
@@ -717,7 +724,7 @@ onUnmounted(() => {
 
   .room-panel {
     padding: 20px;
-    border-radius: 24px;
+    border-radius: 16px;
   }
 
   .room-header h1 {

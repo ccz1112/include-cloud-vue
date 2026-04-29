@@ -82,7 +82,7 @@
                 <p>房间号 {{ room.id }} · 房主 {{ room.ownerName }}</p>
               </div>
               <div class="room-meta">
-                <span>{{ room.players.length }}/{{ room.maxPlayers }}</span>
+                <span>{{ room.seatedCount ?? room.players.length }}/{{ room.maxPlayers }}</span>
                 <span>{{ room.status }}</span>
                 <button class="join-btn" :disabled="joiningRoomId === room.id" @click="joinRoom(room)">
                   {{ joiningRoomId === room.id ? '加入中...' : '加入' }}
@@ -236,28 +236,30 @@ onUnmounted(() => {
 <style scoped>
 .lobby-page {
   min-height: 100vh;
-  padding: 30px;
+  padding: 28px;
   background:
-    radial-gradient(circle at top left, rgba(211, 161, 55, 0.2), transparent 28%),
-    radial-gradient(circle at 85% 12%, rgba(63, 119, 93, 0.16), transparent 24%),
-    linear-gradient(155deg, #10251d 0%, #07120d 100%);
-  color: #f7f0dc;
+    linear-gradient(120deg, rgba(244, 190, 92, 0.12), transparent 34%),
+    radial-gradient(circle at 78% 8%, rgba(63, 176, 137, 0.18), transparent 24%),
+    linear-gradient(180deg, #141817 0%, #07110f 55%, #050807 100%);
+  color: #f4ead3;
   position: relative;
+  overflow-x: hidden;
 }
 
 .lobby-header,
 .hero-panel,
 .content-grid {
-  max-width: 1220px;
+  max-width: 1240px;
   margin: 0 auto;
 }
 
 .lobby-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 20px;
-  margin-bottom: 26px;
+  margin-bottom: 20px;
+  padding: 12px 14px 12px 0;
 }
 
 .eyebrow {
@@ -269,9 +271,10 @@ onUnmounted(() => {
 }
 
 .lobby-header h1 {
-  margin: 0 0 10px;
-  font-size: 52px;
-  color: #ffe6a8;
+  margin: 0 0 8px;
+  font-size: clamp(38px, 5vw, 58px);
+  letter-spacing: 0;
+  color: #fff0c3;
 }
 
 .welcome-copy {
@@ -284,11 +287,12 @@ onUnmounted(() => {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 215, 107, 0.08);
+  gap: 10px;
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 223, 148, 0.12);
+  box-shadow: inset 0 1px rgba(255,255,255,0.05);
 }
 
 .username {
@@ -334,27 +338,25 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 1.2fr auto;
   justify-content: space-between;
-  gap: 18px;
-  padding: 30px;
+  gap: 24px;
+  padding: 34px;
   margin-bottom: 24px;
-  border-radius: 32px;
+  border-radius: 22px;
   background:
-    linear-gradient(135deg, rgba(255, 215, 107, 0.12), rgba(255,255,255,0.02)),
-    rgba(9, 17, 14, 0.7);
-  border: 1px solid rgba(255, 215, 107, 0.18);
-  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.28);
+    linear-gradient(90deg, rgba(10, 16, 14, 0.88), rgba(10, 16, 14, 0.52)),
+    linear-gradient(135deg, rgba(255, 207, 101, 0.16), rgba(70, 160, 121, 0.08));
+  border: 1px solid rgba(255, 223, 148, 0.2);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
   overflow: hidden;
 }
 
 .hero-panel::after {
   content: '';
   position: absolute;
-  width: 240px;
-  height: 240px;
-  right: -70px;
-  top: -80px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 215, 107, 0.15), transparent 70%);
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(255, 223, 148, 0.05) 58%, transparent 100%),
+    repeating-linear-gradient(90deg, transparent 0 34px, rgba(255,255,255,0.025) 34px 35px);
   pointer-events: none;
 }
 
@@ -365,8 +367,8 @@ onUnmounted(() => {
 
 .hero-panel h2 {
   margin: 0 0 10px;
-  font-size: 34px;
-  color: #fff2bc;
+  font-size: clamp(32px, 4vw, 48px);
+  color: #fff4cc;
 }
 
 .hero-copy {
@@ -381,8 +383,10 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 12px;
   align-items: stretch;
-  min-width: 190px;
+  min-width: 210px;
   justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
 .primary-btn,
@@ -394,14 +398,16 @@ onUnmounted(() => {
 
 .primary-btn,
 .join-btn {
-  background: linear-gradient(135deg, #cf9c26, #ffd76b);
-  color: #2b1700;
+  background: linear-gradient(180deg, #ffe08f, #c98b2c);
+  color: #1f1405;
+  box-shadow: 0 12px 24px rgba(193, 137, 44, 0.24);
 }
 
 .secondary-btn,
 .card-btn.muted {
-  background: rgba(255,255,255,0.08);
-  color: #f7f0dc;
+  background: rgba(255,255,255,0.075);
+  color: #f4ead3;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .secondary-btn:disabled,
@@ -412,15 +418,15 @@ onUnmounted(() => {
 
 .content-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
   gap: 22px;
 }
 
 .panel {
-  padding: 24px;
-  border-radius: 28px;
-  background: rgba(6, 12, 9, 0.72);
-  border: 1px solid rgba(255, 215, 107, 0.12);
+  padding: 22px;
+  border-radius: 18px;
+  background: rgba(11, 17, 15, 0.82);
+  border: 1px solid rgba(255, 223, 148, 0.12);
   box-shadow: 0 20px 60px rgba(0,0,0,0.24);
   backdrop-filter: blur(14px);
 }
@@ -445,18 +451,23 @@ onUnmounted(() => {
 
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .game-card {
   position: relative;
-  padding: 20px;
-  border-radius: 24px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+  padding: 18px;
+  min-height: 250px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.075);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.065), rgba(255,255,255,0.025)),
+    rgba(255,255,255,0.02);
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .game-card:hover {
@@ -465,9 +476,9 @@ onUnmounted(() => {
 }
 
 .game-card.active {
-  border-color: rgba(255, 215, 107, 0.5);
+  border-color: rgba(255, 223, 148, 0.62);
   transform: translateY(-2px);
-  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3), inset 0 1px rgba(255,255,255,0.08);
 }
 
 .card-top,
@@ -483,9 +494,9 @@ onUnmounted(() => {
 .players-label {
   display: inline-flex;
   align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.07);
+  padding: 5px 9px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.075);
   font-size: 12px;
 }
 
@@ -493,7 +504,7 @@ onUnmounted(() => {
 .room-item h3 {
   margin: 16px 0 10px;
   color: #ffefc0;
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .game-card p,
@@ -505,7 +516,8 @@ onUnmounted(() => {
 }
 
 .card-actions {
-  margin-top: 18px;
+  margin-top: auto;
+  padding-top: 18px;
 }
 
 .card-btn {
@@ -531,10 +543,10 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 12px;
   align-items: center;
-  padding: 18px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255, 255, 255, 0.065);
 }
 
 .room-item:hover {
@@ -547,8 +559,10 @@ onUnmounted(() => {
   justify-content: center;
   min-height: 220px;
   border: 1px dashed rgba(255,255,255,0.12);
-  border-radius: 22px;
+  border-radius: 14px;
   background: rgba(255,255,255,0.02);
+  text-align: center;
+  padding: 22px;
 }
 
 .room-error {
@@ -574,7 +588,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 720px) {
-  .lobby-page,
   .lobby-header,
   .hero-panel,
   .section-head,
@@ -597,7 +610,7 @@ onUnmounted(() => {
   .hero-panel,
   .panel {
     padding: 20px;
-    border-radius: 24px;
+    border-radius: 16px;
   }
 }
 </style>

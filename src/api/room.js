@@ -52,6 +52,25 @@ function normalizeRoomPlayer(player = {}, index = 0) {
   }
 }
 
+function isOccupiedRoomPlayer(player = {}) {
+  if (player.occupied === false) return false
+  return !!(
+    player.username
+    || player.playerName
+    || player.nickname
+    || player.name
+    || player.playerId
+    || player.userId
+  )
+}
+
+function getRoomPlayerSource(rawRoom = {}) {
+  if (Array.isArray(rawRoom.players)) return rawRoom.players
+  if (Array.isArray(rawRoom.playerList)) return rawRoom.playerList
+  if (Array.isArray(rawRoom.seats)) return rawRoom.seats.filter(isOccupiedRoomPlayer)
+  return []
+}
+
 export function normalizeRoom(room = {}, fallback = {}) {
   const snapshot = unwrapRoomSnapshot(room)
   const rawRoom = snapshot.room || {}
@@ -59,7 +78,7 @@ export function normalizeRoom(room = {}, fallback = {}) {
   const gameCode = rawRoom.gameCode || rawRoom.game?.gameCode || fallback.gameCode || ''
   const gameMeta = getGameMeta(gameCode)
   const normalizedGameId = rawRoom.gameId || rawRoom.game?.gameId || fallback.gameId || gameMeta.gameId
-  const players = (rawRoom.players || rawRoom.playerList || rawRoom.seats || []).map((player, index) => normalizeRoomPlayer(player, index))
+  const players = getRoomPlayerSource(rawRoom).map((player, index) => normalizeRoomPlayer(player, index))
   const playerCount = rawRoom.playerCount ?? snapshot.seatedCount ?? fallback.seatedCount ?? players.length
   const ownerName = rawRoom.ownerName
     || rawRoom.hostPlayerName
@@ -88,14 +107,7 @@ export function normalizeRoom(room = {}, fallback = {}) {
     ownerName,
     status: rawRoom.status || rawRoom.statusLabel || rawRoom.roomStatus || fallback.status || '等待中',
     maxPlayers: rawRoom.maxPlayers || rawRoom.maxPlayerCount || rawRoom.playerLimit || fallback.maxPlayers || gameMeta.maxPlayers,
-    players: players.length ? players : Array.from({ length: playerCount }, (_, index) => ({
-      username: `玩家${index + 1}`,
-      ready: false,
-      isOwner: false,
-      seatIndex: index,
-      playerId: '',
-      raw: null
-    })),
+    players,
     currentGameId,
     lastFinishedGameId,
     gameInstanceId: currentGameId,
